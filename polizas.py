@@ -90,6 +90,7 @@ class poliza(osv.osv):
         for obj in self.browse(cr, uid, ids, context):
             documentos = {}
             gastos = {}
+            arancel = {}
 
             # Ponderar documentos asociados
             for l in obj.lineas:
@@ -104,6 +105,7 @@ class poliza(osv.osv):
                     if g.id not in gastos:
                         gastos[g.id] = 0
                     gastos[g.id] += l.cantidad * l.precio
+
 
             for l in obj.lineas:
 
@@ -135,6 +137,17 @@ class poliza(osv.osv):
                     self.pool.get('importaciones.poliza.linea').write(cr, uid, [l.id], {'total_gastos_importacion': total_gastos / l.cantidad, 'porcentage_gasto_importacion': ( total_gastos + impuestos ) / ( l.precio * l.cantidad ) * 100}, context)
                 else:
                     self.pool.get('importaciones.poliza.linea').write(cr, uid, [l.id], {'total_gastos_importacion': total_gastos_proyectados / l.cantidad, 'porcentage_gasto_importacion': ( total_gastos_proyectados + impuestos ) / ( l.precio * l.cantidad ) * 100}, context)
+
+            # Ponderar arancel
+            arancel_real_total = 0
+            if obj.arancel_total > 0:
+                for l in obj.lineas:
+                    arancel_real_total += l.cantidad * l.impuestos
+
+                for l in obj.lineas:
+                    arancel_real = (((l.cantidad * l.impuestos) / arancel_real_total) * obj.arancel_total) / l.cantidad
+                    self.pool.get('importaciones.poliza.linea').write(cr, uid, [l.id], {'impuestos': arancel_real}, context)
+
         return True
 
     def asignar_costo_albaranes(self, cr, uid, ids, context={}):
@@ -167,6 +180,7 @@ class poliza(osv.osv):
         'moneda': fields.many2one('res.currency', 'Moneda de la compra', required=True),
         'moneda_base': fields.many2one('res.currency', 'Moneda de la compañía', readonly=True),
         'tasa': fields.float('Tasa impuesta por SAT', digits=(12,6), required=True),
+        'arancel_total': fields.float('Arancel total', digits=(12,6)),
     }
 
     _defaults = {

@@ -66,6 +66,7 @@
                             <field name="tipo_importacion"/>
                             <field name="transportista"/>
                             <field name="company_id" widget="selection"/>
+                            <field name="arancel_total"/>
                         </group>
                     </group>
                     <notebook>
