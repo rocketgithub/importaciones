@@ -114,6 +114,7 @@
                                         <field name="costo_proyectado"/>
                                         <field name="diferencia_costos"/>
                                         <field name="total" sum="total"/>
+                                        <field name="costo_asignado"/>
                                     </tree>
                                 </field>
                             </group>
