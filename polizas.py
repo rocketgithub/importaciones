@@ -1,4 +1,4 @@
-# -*- encoding: utf-8 -*-
+ # -*- encoding: utf-8 -*-
 
 from openerp.osv import osv, fields
 import openerp.addons.decimal_precision as dp
@@ -153,12 +153,14 @@ class poliza(osv.osv):
     def asignar_costo_albaranes(self, cr, uid, ids, context={}):
         for obj in self.browse(cr, uid, ids, context):
             for l in obj.lineas:
-                costo = l.costo_proyectado
+                costo = l.costo
                 for o in obj.compras:
                     for p in o.picking_ids:
                         for m in p.move_lines:
                             if m.product_id.id == l.producto_id.id:
                                 self.pool.get('stock.move').write(cr, uid, m.id, {'price_unit': costo})
+                                
+            self.write(cr, uid, [obj.id], {'state': 'realizado'}, context)
         return True
 
     def _get_moneda_compania(self, cr, uid, context=None):
@@ -181,10 +183,12 @@ class poliza(osv.osv):
         'moneda_base': fields.many2one('res.currency', 'Moneda de la compañía', readonly=True),
         'tasa': fields.float('Tasa impuesta por SAT', digits=(12,6), required=True),
         'arancel_total': fields.float('Arancel total', digits=(12,6)),
+        'state': fields.selection( [('borrador','Borrador'), ('realizado','Realizado')], 'Status', required=True, readonly=True, copy=False ),
     }
 
     _defaults = {
         'moneda_base': _get_moneda_compania,
+        'state': 'borrador',
     }
 
 class linea_poliza(osv.osv):

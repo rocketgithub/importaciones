@@ -52,78 +52,83 @@
             <field name="type">form</field>
             <field name="arch" type="xml">
                 <form string="Poliza">
-                    <group>
+                    <header>
+                        <field name="state" widget="statusbar"/>
+                    </header>
+                    <sheet>
                         <group>
-                            <field name="name"/>
-                            <field name="poliza_aduana"/>
-                            <field name="guia"/>
-                            <field name="moneda"/>
-                            <field name="tasa"/>
-                            <field name="moneda_base"/>
+                            <group>
+                                <field name="name"/>
+                                <field name="poliza_aduana"/>
+                                <field name="guia"/>
+                                <field name="moneda"/>
+                                <field name="tasa"/>
+                                <field name="moneda_base"/>
+                            </group>
+                            <group>
+                                <field name="fecha"/>
+                                <field name="tipo_importacion"/>
+                                <field name="transportista"/>
+                                <field name="company_id" widget="selection"/>
+                                <field name="arancel_total"/>
+                            </group>
                         </group>
-                        <group>
-                            <field name="fecha"/>
-                            <field name="tipo_importacion"/>
-                            <field name="transportista"/>
-                            <field name="company_id" widget="selection"/>
-                            <field name="arancel_total"/>
-                        </group>
-                    </group>
-                    <notebook>
-                        <page string="Compras">
-                            <group>
-                                <field name="compras" nolabel="1"> </field>
-                            </group>
-                            <group>
-                                <button name="generar_lineas" string="Generar lineas" icon="gtk-ok" type="object"/>
-                            </group>
-                        </page>
+                        <notebook>
+                            <page string="Compras">
+                                <group>
+                                    <field name="compras" nolabel="1"> </field>
+                                </group>
+                                <group>
+                                    <button name="generar_lineas" string="Generar lineas" icon="gtk-ok" type="object"/>
+                                </group>
+                            </page>
 
-                        <page string="Gastos proyectados">
-                            <group>
-                                <field name="gastos_proyectados" nolabel="1"></field>
-                            </group>
-                            <group>
-                                <button name="asignar_gastos" string="Asignar gastos a todos los productos" icon="gtk-ok" type="object"/>
-                            </group>
-                        </page>
+                            <page string="Gastos proyectados">
+                                <group>
+                                    <field name="gastos_proyectados" nolabel="1"></field>
+                                </group>
+                                <group>
+                                    <button name="asignar_gastos" string="Asignar gastos a todos los productos" icon="gtk-ok" type="object"/>
+                                </group>
+                            </page>
 
-                        <page string="Documentos asociados">
-                            <group>
-                                <field name="documentos_asociados" nolabel="1"></field>
-                            </group>
-                            <group>
-                                <button name="asignar_facturas" string="Asignar facturas a todos los productos" icon="gtk-ok" type="object"/>
-                            </group>
-                        </page>
+                            <page string="Documentos asociados">
+                                <group>
+                                    <field name="documentos_asociados" nolabel="1"></field>
+                                </group>
+                                <group>
+                                    <button name="asignar_facturas" string="Asignar facturas a todos los productos" icon="gtk-ok" type="object"/>
+                                </group>
+                            </page>
 
-                        <page string="Lineas">
-                            <group>
-                                <field name="lineas" nolabel="1">
-                                    <tree string="Lineas">
-                                        <field name="producto_id"/>
-                                        <field name="name"/>
-                                        <field name="total_factura" sum="total_factura"/>
-                                        <field name="impuestos_importacion"/>
-                                        <field name="cantidad"/>
-                                        <field name="precio"/>
-                                        <field name="total_gastos"/>
-                                        <field name="total_gastos_importacion"/>
-                                        <field name="impuestos"/>
-                                        <field name="costo" string="Costo unit."/>
-                                        <field name="costo_proyectado"/>
-                                        <field name="diferencia_costos"/>
-                                        <field name="total" sum="total"/>
-                                    </tree>
-                                </field>
-                            </group>
-                            <group>
-                                <button name="prorrateo_costo" string="Prorrateo" icon="gtk-ok" type="object"/>
-                                <button name="asignar_costo_albaranes" string="Asignar costos" icon="gtk-ok" type="object"/>
-                            </group>
-                        </page>
-                    </notebook>
-                    <field name="comentario"/>
+                            <page string="Lineas">
+                                <group>
+                                    <field name="lineas" nolabel="1">
+                                        <tree string="Lineas">
+                                            <field name="producto_id"/>
+                                            <field name="name"/>
+                                            <field name="total_factura" sum="total_factura"/>
+                                            <field name="impuestos_importacion"/>
+                                            <field name="cantidad"/>
+                                            <field name="precio"/>
+                                            <field name="total_gastos"/>
+                                            <field name="total_gastos_importacion"/>
+                                            <field name="impuestos"/>
+                                            <field name="costo" string="Costo unit."/>
+                                            <field name="costo_proyectado"/>
+                                            <field name="diferencia_costos"/>
+                                            <field name="total" sum="total"/>
+                                        </tree>
+                                    </field>
+                                </group>
+                                <group>
+                                    <button name="prorrateo_costo" string="Prorrateo" icon="gtk-ok" type="object"/>
+                                    <button name="asignar_costo_albaranes" string="Asignar costos" icon="gtk-ok" type="object"/>
+                                </group>
+                            </page>
+                        </notebook>
+                        <field name="comentario"/>
+                    </sheet>
                 </form>
             </field>
         </record>
