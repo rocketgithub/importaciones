@@ -132,7 +132,7 @@ class poliza(osv.osv):
                 costo = ( ( (l.precio + impuestos + l.total_gastos) * l.cantidad ) + total_gastos ) / l.cantidad
                 costo_proyectados = ( ( (l.precio + impuestos + l.total_gastos) * l.cantidad ) + total_gastos_proyectados ) / l.cantidad
 
-                self.pool.get('importaciones.poliza.linea').write(cr, uid, [l.id], {'costo': costo, 'costo_proyectado': costo_proyectados, 'impuestos': impuestos}, context)
+                self.pool.get('importaciones.poliza.linea').write(cr, uid, [l.id], {'costo': costo, 'costo_proyectado': costo_proyectados, 'impuestos': impuestos, 'costo_asignado': True}, context)
                 if total_gastos > 0:
                     self.pool.get('importaciones.poliza.linea').write(cr, uid, [l.id], {'total_gastos_importacion': total_gastos / l.cantidad, 'porcentage_gasto_importacion': ( total_gastos + impuestos ) / ( l.precio * l.cantidad ) * 100}, context)
                 else:
@@ -237,4 +237,5 @@ class linea_poliza(osv.osv):
         'total_gastos': fields.float('G. fact.', digits_compute=dp.get_precision('Product Price')),
         'total_gastos_importacion': fields.float('G. imp.', digits_compute=dp.get_precision('Product Price')),
         'total': fields.function(_total, type='float', method=True, string='Costo total', digits_compute=dp.get_precision('Product Price')),
+        'costo_asignado': fields.boolean('Costo asignado', readonly=True),
     }
