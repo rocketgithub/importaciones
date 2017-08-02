@@ -74,7 +74,7 @@
                 <para style="terp_tblheader_Details">Proveedor</para>
               </td>
               <td>
-                <para style="terp_tblheader_Details">Producto</para>
+                <para style="terp_tblheader_Details">Descripción</para>
               </td>
               <td>
                 <para style="terp_tblheader_Details_Right">Cantidad</para>
@@ -224,7 +224,7 @@
           <para style="terp_tblheader_Details">Proveedor</para>
         </td>
         <td>
-          <para style="terp_tblheader_Details">Producto</para>
+          <para style="terp_tblheader_Details">Descripción</para>
         </td>
         <td>
           <para style="terp_tblheader_Details_Right">Cantidad</para>
@@ -265,7 +265,7 @@
           <para style="terp_default_8">[[ repeatIn(o.lineas, 'l') ]][[ l.pedido.partner_id.name ]]</para>
         </td>
         <td>
-          <para style="terp_default_8">[[ l.producto_id.name_get()[0][1] ]]</para>
+          <para style="terp_default_8">[[ l.name ]]</para>
         </td>
         <td>
           <para style="terp_default_Right_8">[[ formatLang(l.cantidad) ]]</para>
