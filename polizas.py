@@ -139,14 +139,15 @@ class poliza(osv.osv):
                     self.pool.get('importaciones.poliza.linea').write(cr, uid, [l.id], {'total_gastos_importacion': total_gastos_proyectados / l.cantidad, 'porcentage_gasto_importacion': ( total_gastos_proyectados + impuestos ) / ( l.precio * l.cantidad ) * 100}, context)
 
             # Ponderar arancel
-            arancel_real_total = 0
             if obj.arancel_total > 0:
+                precio_total = 0
                 for l in obj.lineas:
-                    arancel_real_total += l.cantidad * l.impuestos
+                    precio_total += l.cantidad * l.precio
 
                 for l in obj.lineas:
-                    arancel_real = (((l.cantidad * l.impuestos) / arancel_real_total) * obj.arancel_total) / l.cantidad
-                    self.pool.get('importaciones.poliza.linea').write(cr, uid, [l.id], {'impuestos': arancel_real}, context)
+                    arancel_real = (((l.cantidad * l.precio) / precio_total) * obj.arancel_total) / l.cantidad
+                    diferencia = arancel_real - l.impuestos
+                    self.pool.get('importaciones.poliza.linea').write(cr, uid, [l.id], {'costo': l.costo + diferencia, 'costo_proyectado': l.costo_proyectado + diferencia, 'impuestos': arancel_real}, context)
 
         return True
 
