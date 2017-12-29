@@ -23,11 +23,9 @@ class poliza(osv.osv):
 
                 if compra.gasto_general_poliza:
                     for linea_compra in compra.order_line:
-
-                        precio_convertido = self.convertir_precio(cr, uid, moneda_compra, obj.moneda.id, obj.moneda_base.id, obj.tasa, obj.fecha, linea_compra.price_unit)
-
                         if linea_compra.product_id.type == 'service':
-                            gasto_general += precio_convertido * linea_compra.product_qty
+                            precio_convertido = self.convertir_precio(cr, uid, moneda_compra, obj.moneda.id, obj.moneda_base.id, obj.tasa, obj.fecha, linea_compra.price_subtotal)
+                            gasto_general += precio_convertido
                 else:
                     total_compras += compra.amount_total
 
@@ -160,7 +158,7 @@ class poliza(osv.osv):
                         for m in p.move_lines:
                             if m.product_id.id == l.producto_id.id:
                                 self.pool.get('stock.move').write(cr, uid, m.id, {'price_unit': costo})
-                                
+
             self.write(cr, uid, [obj.id], {'state': 'realizado'}, context)
         return True
 
