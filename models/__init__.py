@@ -1,5 +1,5 @@
 # -*- encoding: utf-8 -*-
 
-# from . import purchase
-# from . import stock
 from . import polizas
+from . import purchase
+# from . import stock

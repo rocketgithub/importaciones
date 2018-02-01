@@ -10,9 +10,8 @@
     'depends' : ['purchase'],
     'demo' : [ ],
     'data' : [
-        'polizas_view.xml',
-        # 'purchase_view.xml',
-        # 'gastos_view.xml',
+        'views/polizas_view.xml',
+        'views/purchase_view.xml',
     ],
     'installable': True,
 }
