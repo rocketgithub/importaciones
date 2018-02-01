@@ -1,10 +1,35 @@
  # -*- encoding: utf-8 -*-
 
-from openerp.osv import osv, fields
-import openerp.addons.decimal_precision as dp
+from odoo import api, fields, models, _
+import odoo.addons.decimal_precision as dp
+
 import logging
 
-class poliza(osv.osv):
+class TipoGasto(models.Model):
+    _name = 'importaciones.tipo_gasto'
+    _description = 'Tipos de Gastos'
+
+    name = fields.Char(string='Descripción', required=True)
+
+class DocumentoAsociado(models.Model):
+    _name = 'importaciones.documento_asociado'
+    _description = 'Documento Asociado'
+
+    name = fields.Char(string='Descripción', required=True)
+    poliza_id = fields.Many2one('importaciones.poliza', string='Poliza')
+    factura_id = fields.Many2one('account.invoice', string='Documento', domain=[('type','=','in_invoice')])
+    tipo_gasto_id = fields.Many2one('importaciones.tipo_gasto', string='Tipo de Gasto')
+
+class GastoAsociado(models.Model):
+    _name = 'importaciones.gasto_asociado'
+    _description = 'Gastos Proyectados Asociado'
+
+    name = fields.Char(string='Descripción', required=True)
+    poliza_id = fields.Many2one('importaciones.poliza', string='Poliza')
+    valor = fields.Float('Valor', digits_compute=dp.get_precision('Product Price'))
+    tipo_gasto_id = fields.Many2one('importaciones.tipo_gasto', string='Tipo de gasto')
+
+class Poliza(models.Model):
     _name = 'importaciones.poliza'
 
     def convertir_precio(self, cr, uid, moneda_compra_id, moneda_id, moneda_base_id, tasa, fecha, precio):
@@ -165,76 +190,64 @@ class poliza(osv.osv):
     def _get_moneda_compania(self, cr, uid, context=None):
         return self.pool.get('res.users').browse(cr, uid, uid, context=context).company_id.currency_id.id
 
-    _columns = {
-        'name':fields.char('No. Poliza', size=64),
-        'company_id': fields.many2one('res.company', "Compania", required=True),
-        'poliza_aduana':fields.char('Poliza aduana', size=32),
-        'tipo_importacion': fields.selection([('Aereo', 'Aereo'), ('Maritimo', 'Maritimo'), ('Terrestre', 'Terrestre')], 'Tipo de importación'),
-        'guia':fields.char('Guía/BL', size=64),
-        'transportista': fields.many2one('res.partner', "Transportista"),
-        'comentario':fields.text('Comentario'),
-        'fecha': fields.date('Fecha', required=True),
-        'compras': fields.one2many('purchase.order', 'poliza_id', 'Ordenes de compra'),
-        'lineas': fields.one2many('importaciones.poliza.linea', 'poliza_id', 'Lineas'),
-        'gastos_proyectados': fields.one2many('importaciones.gastos_proyectados', 'poliza_id', 'Gastos asociados'),
-        'documentos_asociados': fields.one2many('importaciones.documentos_asociados', 'poliza_id', 'Documentos asociados'),
-        'moneda': fields.many2one('res.currency', 'Moneda de la compra', required=True),
-        'moneda_base': fields.many2one('res.currency', 'Moneda de la compañía', readonly=True),
-        'tasa': fields.float('Tasa impuesta por SAT', digits=(12,6), required=True),
-        'arancel_total': fields.float('Arancel total', digits=(12,6)),
-        'state': fields.selection( [('borrador','Borrador'), ('realizado','Realizado')], 'Status', required=True, readonly=True, copy=False ),
-    }
+    name = fields.Char(string='Descripción', required=True)
+    fecha = fields.Date('Fecha', required=True)
+    company_id = fields.Many2one('res.company', string='Compañía', required=True, default=lambda self: self.env.user.company_id)
+    poliza_aduana = fields.Char('Poliza aduana')
+    tipo_importacion = fields.Selection([('Aereo', 'Aereo'), ('Maritimo', 'Maritimo'), ('Terrestre', 'Terrestre')], string='Tipo de importación')
+    guia = fields.Char('Guía/BL')
+    transportista = fields.Many2one('res.partner', string='Transportista')
+    comentario = fields.Text('Comentario')
+    compras = fields.One2many('purchase.order', 'poliza_id', string='Ordenes de compra')
+    lineas = fields.One2many('importaciones.poliza.linea', 'poliza_id', string='Lineas')
+    gastos_proyectados_ids = fields.One2many('importaciones.gasto_asociado', 'poliza_id', string='Gastos Asociados')
+    documentos_asociados_id = fields.One2many('importaciones.documento_asociado', 'poliza_id', string='Documentos Asociados')
+    moneda_base = fields.Many2one('res.currency', string='Moneda de la Compañía', readonly=True, default=lambda self: self.env.user.company_id.currency_id)
+    moneda_compra = fields.Many2one('res.currency', string='Moneda de la Compra', required=True)
+    tasa = fields.Float('Tasa impuesta por SAT', digits=(12,6), required=True)
+    arancel_total = fields.Float('Arancel total', digits=(12,6))
+    state = fields.Selection( [('borrador','Borrador'), ('realizado','Realizado')], string='Status', required=True, readonly=True, copy=False, default='borrador')
 
-    _defaults = {
-        'moneda_base': _get_moneda_compania,
-        'state': 'borrador',
-    }
-
-class linea_poliza(osv.osv):
+class LineaPoliza(models.Model):
     _name = 'importaciones.poliza.linea'
-    _description = 'Las lineas con los productos de las ordenes de compra'
+    _description = 'Lineas de la Poliza'
 
-    def _diferencia_costos(self, cr, uid, ids, field_name, arg, context=None):
-        res = {}
-        for obj in self.browse(cr, uid, ids, context=context):
-            res[obj.id] = obj.costo_proyectado - obj.costo
-        return res
+    @api.one
+    @api.depends('costo_proyectado', 'costo')
+    def _diferencia_costos(self):
+        self.diferencia_costos = self.costo_proyectado - self.costo
 
-    def _total_factura(self, cr, uid, ids, field_name, arg, context=None):
-        res = {}
-        for obj in self.browse(cr, uid, ids, context=context):
-            res[obj.id] = obj.cantidad * ( obj.precio + obj.total_gastos)
-        return res
+    @api.one
+    @api.depends('cantidad', 'precio', 'total_gastos')
+    def _total_factura(self):
+        self.total_factura = self.cantidad * ( self.precio + self.total_gastos)
 
-    def _total(self, cr, uid, ids, field_name, arg, context=None):
-        res = {}
-        for obj in self.browse(cr, uid, ids, context=context):
-            if len(obj.documentos) > 0:
-                res[obj.id] = obj.costo * obj.cantidad
-            else:
-                res[obj.id] = obj.costo_proyectado * obj.cantidad
-        return res
+    @api.one
+    @api.depends('costo', 'costo_proyectado', 'cantidad')
+    def _total(self):
+        if len(self.documentos) > 0:
+            total = self.costo * self.cantidad
+        else:
+            total = self.costo_proyectado * self.cantidad
 
-    _columns = {
-        'poliza_id': fields.many2one('importaciones.poliza', 'Poliza', required=True),
-        'producto_id': fields.many2one('product.product', 'Producto', required=True),
-        'name': fields.text('Descripcion'),
-        'pedido': fields.many2one('purchase.order', 'Pedido', required=True),
-        'cantidad': fields.float('Cantidad', digits_compute=dp.get_precision('Product Unit of Measure'), required=True),
-        'gastos': fields.many2many('importaciones.gastos_proyectados', 'poliza_linea_gasto_rel', 'poliza_linea', 'gasto', 'Gastos'),
-        'documentos': fields.many2many('account.invoice', 'poliza_linea_factura_rel', 'poliza_linea', 'factura', 'Facuras', domain=[('type','=','in_invoice')]),
-        'impuestos_importacion': fields.many2many('account.tax', 'poliza_impuestos_importacion_rel', 'prod_id', 'tax_id', 'Arancel calculado', domain=[('parent_id', '=', False),('type_tax_use','in',['purchase','all'])]),
-        'impuestos_importacion_manual': fields.float('Arancel manual', digits_compute=dp.get_precision('Product Price')),
-        'impuestos': fields.float('Arancel', digits_compute=dp.get_precision('Product Price')),
-        'precio': fields.float('Precio', digits_compute=dp.get_precision('Product Price'), required=True),
-        'costo_proyectado': fields.float('Costo unit. proyectado', digits_compute=dp.get_precision('Product Price')),
-        'costo': fields.float('Costo unit.', digits_compute=dp.get_precision('Product Price')),
-        'diferencia_costos': fields.function(_diferencia_costos, type='float', method=True, string='Diferencia', digits_compute=dp.get_precision('Product Price')),
-        'porcentage_gasto': fields.float('% G. fact.', digits_compute=dp.get_precision('Product Price')),
-        'porcentage_gasto_importacion': fields.float('% G. imp.', digits_compute=dp.get_precision('Product Price')),
-        'total_factura': fields.function(_total_factura, type='float', method=True, string='Total pedido', digits_compute=dp.get_precision('Product Price')),
-        'total_gastos': fields.float('G. fact.', digits_compute=dp.get_precision('Product Price')),
-        'total_gastos_importacion': fields.float('G. imp.', digits_compute=dp.get_precision('Product Price')),
-        'total': fields.function(_total, type='float', method=True, string='Costo total', digits_compute=dp.get_precision('Product Price')),
-        'costo_asignado': fields.boolean('Costo asignado', readonly=True),
-    }
+    poliza_id = fields.Many2one('importaciones.poliza', string='Poliza', required=True)
+    producto_id = fields.Many2one('product.product', string='Producto', required=True)
+    name = fields.Text('Descripcion')
+    pedido = fields.Many2one('purchase.order', string='Pedido', required=True)
+    cantidad = fields.Float('Cantidad', digits_compute=dp.get_precision('Product Unit of Measure'), required=True)
+    gastos_ids = fields.Many2many('importaciones.gasto_asociado', string='Gastos')
+    documentos_ids = fields.Many2many('account.invoice', string='Facuras', domain=[('type','=','in_invoice')])
+    impuestos_importacion_ids = fields.Many2many('account.tax', string='Aranceles', domain=[('parent_id', '=', False),('type_tax_use','in',['purchase','all'])])
+    impuestos_importacion_manual = fields.Float('Aranceles Manuales', digits_compute=dp.get_precision('Product Price'))
+    impuestos = fields.Float('Aranceles', digits_compute=dp.get_precision('Product Price'))
+    precio = fields.Float('Precio', digits_compute=dp.get_precision('Product Price'), required=True)
+    costo_proyectado = fields.Float('Costo unit. proyectado', digits_compute=dp.get_precision('Product Price'))
+    costo = fields.Float('Costo unit.', digits_compute=dp.get_precision('Product Price'))
+    diferencia_costos = fields.Float('Diferencia', digits_compute=dp.get_precision('Product Price'), compute='_diferencia_costos')
+    porcentage_gasto = fields.Float('% G. fact.', digits_compute=dp.get_precision('Product Price'))
+    porcentage_gasto_importacion = fields.Float('% G. imp.', digits_compute=dp.get_precision('Product Price'))
+    total_factura = fields.Float('Total pedido', digits_compute=dp.get_precision('Product Price'), compute='_total_factura')
+    total_gastos = fields.Float('G. fact.', digits_compute=dp.get_precision('Product Price'))
+    total_gastos_importacion = fields.Float('G. imp.', digits_compute=dp.get_precision('Product Price'))
+    total = fields.Float('Costo total', digits_compute=dp.get_precision('Product Price'), compute='_total')
+    costo_asignado = fields.Boolean('Costo asignado', readonly=True)

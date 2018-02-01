@@ -11,9 +11,8 @@
     'demo' : [ ],
     'data' : [
         'polizas_view.xml',
-        'purchase_view.xml',
-        'catalogos_view.xml',
-        'gastos_view.xml',
+        # 'purchase_view.xml',
+        # 'gastos_view.xml',
     ],
     'installable': True,
 }
