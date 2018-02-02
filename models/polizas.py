@@ -43,7 +43,7 @@ class Poliza(models.Model):
         gasto_general = 0
         total_compras = 0
         for compra in self.compras_ids:
-            moneda_compra = compra.currency_id.id
+            moneda_compra = compra.currency_id
 
             if compra.gasto_general_poliza:
                 for linea_compra in compra.order_line:
