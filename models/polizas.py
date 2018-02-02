@@ -31,6 +31,7 @@ class GastoAsociado(models.Model):
 
 class Poliza(models.Model):
     _name = 'importaciones.poliza'
+    _description = 'Poliza'
 
     @api.model
     def convertir_precio(self, moneda_id, moneda_compra_id, moneda_base_id, tasa, fecha, precio):
