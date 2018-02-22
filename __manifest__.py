@@ -12,6 +12,7 @@
     'data' : [
         'views/polizas_view.xml',
         'views/purchase_view.xml',
+        'security/ir.model.access.csv',
     ],
     'installable': True,
 }
