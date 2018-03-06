@@ -2,6 +2,7 @@
 
 from odoo import api, fields, models, _
 import odoo.addons.decimal_precision as dp
+from odoo.exceptions import UserError
 
 import logging
 
@@ -40,7 +41,9 @@ class Poliza(models.Model):
         else:
             return moneda_id.with_context(date=fecha).compute(precio, moneda_base_id)
 
+    @api.multi
     def generar_lineas(self):
+        self.ensure_one()
         gasto_general = 0
         total_compras = 0
         for compra in self.compras_ids:
@@ -99,17 +102,23 @@ class Poliza(models.Model):
                 })
         return True
 
+    @api.multi
     def asignar_gastos(self):
+        self.ensure_one()
         for l in self.lineas_ids:
             l.gastos_ids = [(6, 0, [x.id for x in self.gastos_asociados_ids])]
         return True
 
+    @api.multi
     def asignar_facturas(self):
+        self.ensure_one()
         for l in self.lineas_ids:
             l.documentos_ids = [(6, 0, [x.factura_id.id for x in self.documentos_asociados_ids])]
         return True
 
+    @api.multi
     def prorrateo_costo(self):
+        self.ensure_one()
         documentos = {}
         gastos = {}
         arancel = {}
@@ -179,16 +188,13 @@ class Poliza(models.Model):
 
         return True
 
+    @api.multi
     def asignar_costo_albaranes(self):
+        self.ensure_one()
         for l in self.lineas_ids:
-            costo = l.costo
-            for c in self.compras_ids:
-                for p in c.picking_ids:
-                    for m in p.move_lines:
-                        if m.product_id.id == l.producto_id.id:
-                            m.price_unit = costo
-
-            self.state = 'realizado'
+            if not l.costo_asignado:
+                raise UserError('No puede asignar costos hasta que todos las lineas hayan sido prorrateadas')
+        self.state = 'realizado'
         return True
 
     name = fields.Char(string='Descripción', required=True)

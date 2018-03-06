@@ -1,17 +1,31 @@
 # -*- coding: utf-8 -*-
 
-from openerp.osv import fields, osv
+from odoo import api, fields, models, _
+from odoo.exceptions import UserError
+
 import logging
 
-class stock_picking(osv.osv):
+class Picking(models.Model):
     _inherit = "stock.picking"
 
-    def do_enter_transfer_details(self, cr, uid, picking, context=None):
-        p = self.browse(cr, uid, picking, context=context)
-        for l in p.move_lines:
+    @api.multi
+    def action_done(self):
+        for l in self.move_lines:
             if l.purchase_line_id and l.purchase_line_id.order_id and l.purchase_line_id.order_id.poliza_id:
                 if l.purchase_line_id.order_id.poliza_id.state != 'realizado':
-                    raise osv.except_osv('Error!', 'Antes de poder transferir este documento debe de procesar la importación.')
-        return super(stock_picking, self).do_enter_transfer_details(cr, uid, picking, context=context)
+                    raise UserError('Antes de poder transferir este documento debe de procesar la importación.')
+        return super(Picking, self).action_done()
 
-# vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:
+class StockMove(models.Model):
+    _inherit = 'stock.move'
+
+    @api.multi
+    def get_price_unit(self):
+        self.ensure_one()
+        if self.purchase_line_id and self.purchase_line_id.order_id and self.purchase_line_id.order_id.poliza_id:
+            costo = 0
+            for l in self.purchase_line_id.order_id.poliza_id.lineas_ids:
+                if l.producto_id.id == self.product_id.id:
+                    costo = l.costo
+            return costo
+        return super(StockMove, self)._get_price_unit()
