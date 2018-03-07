@@ -28,4 +28,4 @@ class StockMove(models.Model):
                 if l.producto_id.id == self.product_id.id:
                     costo = l.costo
             return costo
-        return super(StockMove, self)._get_price_unit()
+        return super(StockMove, self).get_price_unit()
