@@ -77,19 +77,16 @@ class Poliza(models.Model):
                     total_productos += precio_convertido * linea_compra.product_qty
 
             for linea_compra in compra.order_line:
-                logging.warn('3')
-
                 if linea_compra.product_id.type != 'product':
                     continue
 
                 precio_convertido = self.convertir_precio(moneda_compra, self.moneda_compra_id, self.moneda_base_id, self.tasa, self.fecha, linea_compra.price_unit)
 
-                cantidad_recibida = linea_compra.product_qty
+                cantidad_recibida = linea_compra.product_uom._compute_quantity(linea_compra.product_qty, linea_compra.product_id.uom_id)
 
                 gasto = ( ( ( precio_convertido * cantidad_recibida ) /  total_productos ) * gastos ) / cantidad_recibida
                 precio_con_gastos = precio_convertido + gasto
 
-                logging.warn(self.id)
                 self.env['importaciones.poliza.linea'].create({
                     'poliza_id': self.id,
                     'producto_id': linea_compra.product_id.id,
