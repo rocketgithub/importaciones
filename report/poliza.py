@@ -19,25 +19,17 @@
 #
 ##############################################################################
 
+from odoo import api, models, fields
 import time
-from openerp.report import report_sxw
-from openerp.osv import osv
-from openerp import pooler
+import logging
 
-class poliza(report_sxw.rml_parse):
-    def __init__(self, cr, uid, name, context):
-        super(poliza, self).__init__(cr, uid, name, context=context)
-        self.localcontext.update({
-            'time': time,
-            'totales': self.totales,
-            'gastos': self.gastos,
-            'facturas': self.facturas,
-        })
+class ReportPoliza(models.AbstractModel):
+    _name = 'report.importaciones.poliza'
 
-    def gastos(self, pedidos):
+    def gastos(self, o):
         gastos = []
 
-        for p in pedidos:
+        for p in o.compras_ids:
             linea = {
                 'proveedor': p.partner_id.name,
                 'pedido': p.name,
@@ -53,10 +45,10 @@ class poliza(report_sxw.rml_parse):
 
         return gastos
 
-    def facturas(self, documentos):
+    def facturas(self, o):
         facturas = []
 
-        for d in documentos:
+        for d in o.documentos_asociados_ids:
             linea = {
                 'proveedor': d.factura_id.partner_id.name,
                 'factura': d.factura_id.reference,
@@ -67,7 +59,7 @@ class poliza(report_sxw.rml_parse):
 
         return facturas
 
-    def totales(self, lineas):
+    def totales(self, o):
         totales = {
             'cantidad':0,
             'impuestos':0,
@@ -80,7 +72,7 @@ class poliza(report_sxw.rml_parse):
             'total':0,
         }
 
-        for l in lineas:
+        for l in o.lineas_ids:
             totales['cantidad'] += l.cantidad
             totales['impuestos'] += l.impuestos*l.cantidad
             totales['costo_proyectado'] += l.costo_proyectado*l.cantidad
@@ -89,9 +81,23 @@ class poliza(report_sxw.rml_parse):
             totales['total_gastos_importacion'] += l.total_gastos_importacion*l.cantidad
 
         return [totales]
+#
+#
+# report_sxw.report_sxw('report.poliza','importaciones.poliza','importaciones/reportes/poliza.rml',parser=poliza,header='internal landscape')
+    @api.model
+    def render_html(self, docids, data=None):
+        self.model = 'importaciones.poliza'
+        docs = self.env[self.model].browse(docids)
 
-
-report_sxw.report_sxw('report.poliza','importaciones.poliza','importaciones/reportes/poliza.rml',parser=poliza,header='internal landscape')
-
+        docargs = {
+            'doc_ids': docids,
+            'doc_model': self.model,
+            'docs': docs,
+            'time': time,
+            'totales': self.totales,
+            'gastos': self.gastos,
+            'facturas': self.facturas,
+        }
+        return self.env['report'].render('importaciones.poliza', docargs)
 
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <report
+            id="importaciones_poliza"
+            string="Poliza"
+            model="importaciones.poliza"
+            report_type="qweb-pdf"
+            file="importaciones.poliza"
+            name="importaciones.poliza"
+        />
+
+    </data>
+</odoo>
