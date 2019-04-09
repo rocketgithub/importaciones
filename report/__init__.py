@@ -1,1 +1,1 @@
-import poliza
+from . import poliza
