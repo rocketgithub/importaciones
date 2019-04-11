@@ -1,94 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<odoo>
+<openerp>
     <data>
-
-        <record id="view_tipos_gastos_form" model="ir.ui.view">
-            <field name="name">tipos.gastos.form</field>
-            <field name="model">importaciones.tipo_gasto</field>
-            <field name="type">form</field>
-            <field name="arch" type="xml">
-                <form string="Tipos de Gastos">
-                    <group>
-                        <field name="name"/>
-                    </group>
-                </form>
-            </field>
-        </record>
-
-        <record id="view_tipos_gastos_tree" model="ir.ui.view">
-            <field name="name">tipos.gastos.tree</field>
-            <field name="model">importaciones.tipo_gasto</field>
-            <field name="type">tree</field>
-            <field name="arch" type="xml">
-                <tree string="Tipos de Gastos">
-                    <field name="name"/>
-                </tree>
-            </field>
-        </record>
-
-        <record id="action_tipos_gastos_form" model="ir.actions.act_window">
-            <field name="name">Tipos de gastos</field>
-            <field name="type">ir.actions.act_window</field>
-            <field name="res_model">importaciones.tipo_gasto</field>
-            <field name="view_type">form</field>
-        </record>
-        <menuitem id="menu_tipos_gastos_form" action="action_tipos_gastos_form" parent="purchase.menu_purchase_config"/>
-
-        <record id="view_documento_asociado_form" model="ir.ui.view">
-            <field name="name">documento.asociado.form</field>
-            <field name="model">importaciones.documento_asociado</field>
-            <field name="type">form</field>
-            <field name="arch" type="xml">
-                <form string="Documentos Asociados">
-                    <group>
-                        <field name="name"/>
-                        <field name="factura_id"/>
-                        <field name="tipo_gasto_id" widget='selection'/>
-                    </group>
-                </form>
-            </field>
-        </record>
-
-        <record id="view_documento_asociado_tree" model="ir.ui.view">
-            <field name="name">documento.asociado.tree</field>
-            <field name="model">importaciones.documento_asociado</field>
-            <field name="type">tree</field>
-            <field name="arch" type="xml">
-                <tree string="Documentos Asociados">
-                    <field name="name"/>
-                    <field name="factura_id"/>
-                    <field name="tipo_gasto_id"/>
-                </tree>
-            </field>
-        </record>
-
-        <record id="view_gasto_asociado_form" model="ir.ui.view">
-            <field name="name">gasto_asociado.form</field>
-            <field name="model">importaciones.gasto_asociado</field>
-            <field name="type">form</field>
-            <field name="arch" type="xml">
-                <form string="Gastos Asociados">
-                    <group>
-                        <field name="name"/>
-                        <field name="valor"/>
-                        <field name="tipo_gasto_id" widget='selection'/>
-                    </group>
-                </form>
-            </field>
-        </record>
-
-        <record id="view_gasto_asociado_tree" model="ir.ui.view">
-            <field name="name">gasto_asociado.tree</field>
-            <field name="model">importaciones.gasto_asociado</field>
-            <field name="type">tree</field>
-            <field name="arch" type="xml">
-                <tree string="Gastos Asociados">
-                    <field name="name"/>
-                    <field name="valor"/>
-                    <field name="tipo_gasto_id"/>
-                </tree>
-            </field>
-        </record>
 
         <record id="polizas_view" model="ir.ui.view">
             <field name="name">polizas.view</field>
@@ -126,9 +38,9 @@
                         </group>
                     </group>
                     <group>
-                        <field name="impuestos_importacion_ids"/>
-                        <field name="gastos_ids"/>
-                        <field name="documentos_ids"/>
+                        <field name="impuestos_importacion"/>
+                        <field name="gastos"/>
+                        <field name="documentos"/>
                     </group>
                 </form>
             </field>
@@ -149,14 +61,14 @@
                                 <field name="name"/>
                                 <field name="poliza_aduana"/>
                                 <field name="guia"/>
-                                <field name="moneda_compra_id"/>
+                                <field name="moneda"/>
                                 <field name="tasa"/>
-                                <field name="moneda_base_id"/>
+                                <field name="moneda_base"/>
                             </group>
                             <group>
                                 <field name="fecha"/>
                                 <field name="tipo_importacion"/>
-                                <field name="transportista_id"/>
+                                <field name="transportista"/>
                                 <field name="company_id" widget="selection"/>
                                 <field name="arancel_total"/>
                             </group>
@@ -164,40 +76,39 @@
                         <notebook>
                             <page string="Compras">
                                 <group>
-                                    <field name="compras_ids" nolabel="1"> </field>
+                                    <field name="compras" nolabel="1"> </field>
                                 </group>
                                 <group>
-                                    <button name="generar_lineas" string="Generar lineas" type="object"/>
+                                    <button name="generar_lineas" string="Generar lineas" icon="gtk-ok" type="object"/>
                                 </group>
-                                <field name="comentario"/>
                             </page>
 
                             <page string="Gastos proyectados">
                                 <group>
-                                    <field name="gastos_asociados_ids" nolabel="1"></field>
+                                    <field name="gastos_proyectados" nolabel="1"></field>
                                 </group>
                                 <group>
-                                    <button name="asignar_gastos" string="Asignar gastos a todos los productos" type="object"/>
+                                    <button name="asignar_gastos" string="Asignar gastos a todos los productos" icon="gtk-ok" type="object"/>
                                 </group>
                             </page>
 
                             <page string="Documentos asociados">
                                 <group>
-                                    <field name="documentos_asociados_ids" nolabel="1"></field>
+                                    <field name="documentos_asociados" nolabel="1"></field>
                                 </group>
                                 <group>
-                                    <button name="asignar_facturas" string="Asignar facturas a todos los productos" type="object"/>
+                                    <button name="asignar_facturas" string="Asignar facturas a todos los productos" icon="gtk-ok" type="object"/>
                                 </group>
                             </page>
 
                             <page string="Lineas">
                                 <group>
-                                    <field name="lineas_ids" nolabel="1">
+                                    <field name="lineas" nolabel="1">
                                         <tree string="Lineas">
                                             <field name="producto_id"/>
                                             <field name="name"/>
                                             <field name="total_factura" sum="total_factura"/>
-                                            <field name="impuestos_importacion_ids"/>
+                                            <field name="impuestos_importacion"/>
                                             <field name="cantidad"/>
                                             <field name="precio"/>
                                             <field name="total_gastos"/>
@@ -212,11 +123,12 @@
                                     </field>
                                 </group>
                                 <group>
-                                    <button name="prorrateo_costo" string="Prorrateo" type="object"/>
-                                    <button name="asignar_costo_albaranes" string="Asignar costos" type="object"/>
+                                    <button name="prorrateo_costo" string="Prorrateo" icon="gtk-ok" type="object"/>
+                                    <button name="asignar_costo_albaranes" string="Asignar costos" icon="gtk-ok" type="object"/>
                                 </group>
                             </page>
                         </notebook>
+                        <field name="comentario"/>
                     </sheet>
                 </form>
             </field>
@@ -231,7 +143,7 @@
         </record>
         <menuitem id="menu_polizas_form" action="action_polizas_form" parent="purchase.menu_procurement_management"/>
 
-        <!-- <report auto="False" id="reporte_poliza" model="importaciones.poliza" name="poliza" rml="importaciones/reportes/poliza.rml" string="Poliza"/> -->
+        <report auto="False" id="reporte_poliza" model="importaciones.poliza" name="poliza" rml="importaciones/reportes/poliza.rml" string="Poliza"/>
 
     </data>
-</odoo>
+</openerp>
