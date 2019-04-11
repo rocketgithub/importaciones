@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="poliza">
+        <t t-call="web.html_container">
+            <t t-set="data_report_margin_top" t-value="12"/>
+            <t t-set="data_report_header_spacing" t-value="9"/>
+            <t t-set="data_report_dpi" t-value="110"/>
+            <t t-foreach="docs" t-as="o">
+                <div class="article">
+                    <div class="page">
+                        <t t-set="gastos_poliza" t-value="gastos(o)"/>
+                        <t t-set="facturas_poliza" t-value="facturas(o)"/>
+                        <t t-set="totales_poliza" t-value="totales(o)"/>
+                        <div style="text-align:center">
+                            <h2><span t-field="o.name"/></h2>
+                            <br/>
+                            Fecha: <span t-field="o.fecha"/>
+                        </div>
+                        <table style="margin: 0px auto;width:15cm">
+                            <tr>
+                                <th colspan="4" style="text-align:center;">Resumen de pedidos</th>
+                            </tr>
+                            <tr>
+                                <th style="text-align:center;">Proveedor</th>
+                                <th style="text-align:center">Pedido</th>
+                                <th style="text-align:center">Gasto</th>
+                                <th style="text-align:center">Total</th>
+                            </tr>
+                            <tr t-foreach="gastos_poliza" t-as="gasto">
+                                <td><span t-esc="gasto['proveedor']"/></td>
+                                <td><span t-esc="gasto['pedido']"/></td>
+                                <td style="text-align:right"><span t-esc="gasto['gasto']" t-esc-options="{'widget': 'monetary', 'display_currency': o.company_id.currency_id}"/></td>
+                                <td style="text-align:right"><span t-esc="gasto['total']" t-esc-options="{'widget': 'monetary', 'display_currency': o.company_id.currency_id}"/></td>
+                            </tr>
+                        </table>
+                        <br/>
+                        <br/>
+                        <br/>
+                        <table style="margin: 0px auto;width:15cm">
+                            <tr>
+                                <th colspan="3" style="text-align:center">Resumen de facturas</th>
+                            </tr>
+                            <tr>
+                                <th style="text-align:center">Proveedor</th>
+                                <th style="text-align:center">Factura</th>
+                                <th style="text-align:center">Total</th>
+                            </tr>
+                            <tr t-foreach="facturas_poliza" t-as="factura">
+                                <td><span t-esc="factura['proveedor']"/></td>
+                                <td><span t-esc="factura['factura']"/></td>
+                                <td style="text-align:right"><span t-esc="factura['total']" t-esc-options="{'widget': 'monetary', 'display_currency': o.company_id.currency_id}"/></td>
+                            </tr>
+                        </table>
+                        <br/>
+                        <br/>
+                        <br/>
+                        <table style="margin: 0px auto;width:15cm">
+                            <tr>
+                                <th colspan="4" style="text-align:center">Información extra</th>
+                            </tr>
+                            <tr>
+                                <th style="text-align:center">Tipo de importación</th>
+                                <th style="text-align:center">Transportista</th>
+                                <th style="text-align:center">Guía/BL</th>
+                                <th style="text-align:center">Comentario</th>
+                            </tr>
+                            <tr>
+                                <td><span t-field="o.tipo_importacion"/></td>
+                                <td><span t-field="o.transportista_id.name"/></td>
+                                <td><span t-field="o.guia"/></td>
+                                <td><span t-field="o.comentario"/></td>
+                            </tr>
+                        </table>
+                        <br/>
+                        <br/>
+                        <br/>
+                        <table style="margin: 0px auto;width:30cm">
+                            <tr>
+                                <th style="text-align:center">Proveedor</th>
+                                <th style="text-align:center">Descripción</th>
+                                <th style="text-align:center">Cantidad</th>
+                                <th style="text-align:center">Precio <span t-field="o.company_id.currency_id.name"/></th>
+                                <th style="text-align:center">G. fact.unit. <span t-field="o.company_id.currency_id.name"/></th>
+                                <th style="text-align:center">G. imp.unit. <span t-field="o.company_id.currency_id.name"/></th>
+                                <th style="text-align:center">Arancel unit <span t-field="o.company_id.currency_id.name"/></th>
+                                <th style="text-align:center">Costo unitario FOB <span t-field="o.company_id.currency_id.name"/></th>
+                                <th style="text-align:center">Costo unitario proyectado FOB <span t-field="o.company_id.currency_id.name"/></th>
+                                <th style="text-align:center">G. fact. <span t-field="o.company_id.currency_id.name"/> </th>
+                                <th style="text-align:center">G. imp. <span t-field="o.company_id.currency_id.name"/></th>
+                                <th style="text-align:center">Arancel <span t-field="o.company_id.currency_id.name"/></th>
+                                <th style="text-align:center">Costo total <span t-field="o.company_id.currency_id.name"/> </th>
+                            </tr>
+                            <tr t-foreach="o.lineas_ids" t-as="linea">
+                                <td><span t-field="linea.pedido.partner_id.name"/></td>
+                                <td><span t-field="linea.name"/></td>
+                                <td><span t-field="linea.cantidad"/></td>
+                                <td style="text-align:right"><span t-field="linea.precio" t-esc-options="{'widget': 'monetary', 'display_currency': o.company_id.currency_id}"/></td>
+                                <td style="text-align:right"><span t-field="linea.total_gastos" t-esc-options="{'widget': 'monetary', 'display_currency': o.company_id.currency_id}"/></td>
+                                <td style="text-align:right"><span t-field="linea.total_gastos_importacion" t-esc-options="{'widget': 'monetary', 'display_currency': o.company_id.currency_id}"/></td>
+                                <td style="text-align:right"><span t-field="linea.impuestos" t-esc-options="{'widget': 'monetary', 'display_currency': o.company_id.currency_id}"/></td>
+                                <td style="text-align:right"><span t-field="linea.costo" t-esc-options="{'widget': 'monetary', 'display_currency': o.company_id.currency_id}"/></td>
+                                <td style="text-align:right"><span t-field="linea.costo_proyectado" t-esc-options="{'widget': 'monetary', 'display_currency': o.company_id.currency_id}"/></td>
+                                <td style="text-align:right"><span t-esc="linea.total_gastos*linea.cantidad" t-esc-options="{'widget': 'monetary', 'display_currency': o.company_id.currency_id}"/></td>
+                                <td style="text-align:right"><span t-esc="linea.total_gastos_importacion*linea.cantidad" t-esc-options="{'widget': 'monetary', 'display_currency': o.company_id.currency_id}"/></td>
+                                <td style="text-align:right"><span t-esc="linea.impuestos*linea.cantidad" t-esc-options="{'widget': 'monetary', 'display_currency': o.company_id.currency_id}"/></td>
+                                <td style="text-align:right"><span t-esc="linea.total" t-esc-options="{'widget': 'monetary', 'display_currency': o.company_id.currency_id}"/></td>
+                            </tr>
+                            <tr>
+                                <t t-foreach="totales_poliza" t-as="total">
+                                    <td></td>
+                                    <td style="text-align:right"><b><span t-esc="total['cantidad']"/></b></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td style="text-align:right"><b><span t-esc="total['total_gastos']" t-esc-options="{'widget': 'monetary', 'display_currency': o.company_id.currency_id}"/></b></td>
+                                    <td style="text-align:right"><b><span t-esc="total['total_gastos_importacion']" t-esc-options="{'widget': 'monetary', 'display_currency': o.company_id.currency_id}"/></b></td>
+                                    <td style="text-align:right"><b><span t-esc="total['impuestos']" t-esc-options="{'widget': 'monetary', 'display_currency': o.company_id.currency_id}"/></b></td>
+                                    <td style="text-align:right"><b><span t-esc="total['costo_proyectado']" t-esc-options="{'widget': 'monetary', 'display_currency': o.company_id.currency_id}"/></b></td>
+                                </t>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </t>
+        </t>
+    </template>
+</odoo>
