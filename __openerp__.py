@@ -1,5 +1,11 @@
 # -*- encoding: utf-8 -*-
 
+#
+# Este es el modulo para toda la configuracion y funcionalidad de importaciones.
+#
+# Status 1.0 - tested on Open ERP 6.0.2
+#
+
 {
     'name' : 'Importaciones',
     'version' : '1.0',
@@ -10,12 +16,12 @@
     'depends' : ['purchase'],
     'demo' : [ ],
     'data' : [
-        'views/polizas_view.xml',
-        'views/report.xml',
-        'views/poliza.xml',
-        'views/purchase_view.xml',
-        'security/ir.model.access.csv',
-        'security/importaciones_security.xml',
+        'polizas_view.xml',
+        'purchase_view.xml',
+        'catalogos_view.xml',
+        'gastos_view.xml',
+        #'res_company_view.xml',
+        #'product_view.xml'
     ],
     'installable': True,
 }

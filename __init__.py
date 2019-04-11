@@ -1,4 +1,10 @@
 # -*- encoding: utf-8 -*-
 
-from . import models
-from . import report
+import purchase
+import stock
+import polizas
+import catalogos
+import gastos
+import reportes
+#import res_company
+#import product
