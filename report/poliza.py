@@ -81,15 +81,13 @@ class ReportPoliza(models.AbstractModel):
             totales['total_gastos_importacion'] += l.total_gastos_importacion*l.cantidad
 
         return [totales]
-#
-#
-# report_sxw.report_sxw('report.poliza','importaciones.poliza','importaciones/reportes/poliza.rml',parser=poliza,header='internal landscape')
+
     @api.model
-    def render_html(self, docids, data=None):
+    def get_report_values(self, docids, data=None):
         self.model = 'importaciones.poliza'
         docs = self.env[self.model].browse(docids)
 
-        docargs = {
+        return {
             'doc_ids': docids,
             'doc_model': self.model,
             'docs': docs,
@@ -98,6 +96,4 @@ class ReportPoliza(models.AbstractModel):
             'gastos': self.gastos,
             'facturas': self.facturas,
         }
-        return self.env['report'].render('importaciones.poliza', docargs)
-
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:
