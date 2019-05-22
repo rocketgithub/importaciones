@@ -7,7 +7,7 @@
     'description': """Modulo de importaciones de Prisma.""",
     'author': 'Rodrigo Fernández',
     'website': 'http://solucionesprisma.com/',
-    'depends' : ['purchase'],
+    'depends' : ['stock_account', 'purchase'],
     'demo' : [ ],
     'data' : [
         'views/polizas_view.xml',
