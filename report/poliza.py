@@ -83,7 +83,7 @@ class ReportPoliza(models.AbstractModel):
         return [totales]
 
     @api.model
-    def get_report_values(self, docids, data=None):
+    def _get_report_values(self, docids, data=None):
         self.model = 'importaciones.poliza'
         docs = self.env[self.model].browse(docids)
 
