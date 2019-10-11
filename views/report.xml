@@ -1,6 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <data>
+        
+        <record id="paperformat_poliza" model="report.paperformat">
+            <field name="name">Poliza</field>
+            <field name="format">Letter</field>
+            <field name="orientation">Landscape</field>
+            <field name="margin_top">40.00</field>
+            <field name="margin_bottom">25.00</field>
+            <field name="margin_left">7.00</field>
+            <field name="margin_right">7.00</field>
+            <field name="header_line" eval="False" />
+            <field name="header_spacing">35</field>
+            <field name="dpi">90</field>
+        </record>
 
         <report
             id="importaciones_poliza"
