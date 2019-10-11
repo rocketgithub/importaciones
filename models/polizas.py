@@ -69,7 +69,7 @@ class Poliza(models.Model):
 
             for linea_compra in compra.order_line:
 
-                precio_convertido = self.convertir_precio(moneda_compra, self.moneda_compra_id, self.moneda_base_id, self.tasa, self.fecha, linea_compra.price_unit)
+                precio_convertido = self.convertir_precio(moneda_compra, self.moneda_compra_id, self.moneda_base_id, self.tasa, self.fecha, linea_compra.price_subtotal/linea_compra.product_qty)
 
                 if linea_compra.product_id.type == 'service':
                     gastos += precio_convertido * linea_compra.product_qty
@@ -80,7 +80,7 @@ class Poliza(models.Model):
                 if linea_compra.product_id.type != 'product':
                     continue
 
-                precio_convertido = self.convertir_precio(moneda_compra, self.moneda_compra_id, self.moneda_base_id, self.tasa, self.fecha, linea_compra.price_unit)
+                precio_convertido = self.convertir_precio(moneda_compra, self.moneda_compra_id, self.moneda_base_id, self.tasa, self.fecha, linea_compra.price_subtotal/linea_compra.product_qty)
 
                 cantidad_recibida = linea_compra.product_uom._compute_quantity(linea_compra.product_qty, linea_compra.product_id.uom_id)
 
